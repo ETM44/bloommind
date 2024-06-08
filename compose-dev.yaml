@@ -13,42 +13,35 @@ services:
 
   backend:
     build:
-      context: .
-      dockerfile: ./docker/Dockerfile.backend
+      context: ./backend
+      target: development
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/mydatabase
     ports:
       - "3001:3001"
-    environment:
-      DATABASE_URL: "postgres://postgres:password@postgres:5432/mybloomminddb"
-    networks:
-      - dev-net
-
+  
   frontend:
     build:
-      context: .
-      dockerfile: ./docker/Dockerfile.frontend
+      context: ./frontend
+      target: development
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
     ports:
       - "3000:3000"
-    networks:
-      - dev-net
-    depends_on:
-      - backend
-
-  postgres:
+  
+  db:
     image: postgres:13
+    restart: always
+    volumes:
+      - db-data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: mybloomminddb
+      POSTGRES_DB: mydatabase
     ports:
       - "5432:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    networks:
-      - dev-net
-
-networks:
-  dev-net:
-    driver: bridge
 
 volumes:
-  postgres-data:
+  db-data:
