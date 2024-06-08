@@ -1,0 +1,13 @@
+# docker/Dockerfile.frontend
+FROM node:latest-alpine
+
+WORKDIR /app
+
+COPY ./apps/frontend/package*.json ./
+RUN npm install
+
+COPY ./apps/frontend .
+
+RUN npm run build
+
+CMD ["npm", "start"]

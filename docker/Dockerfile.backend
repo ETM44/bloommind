@@ -1,0 +1,13 @@
+# docker/Dockerfile.backend
+FROM node:latest-alpine
+
+WORKDIR /app
+
+COPY ./apps/backend/package*.json ./
+RUN npm install
+
+COPY ./apps/backend .
+
+RUN npm run build
+
+CMD ["node", "dist/main"]

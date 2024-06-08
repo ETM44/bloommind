@@ -1,12 +1,54 @@
+version: '3.8'
 services:
   app:
-    entrypoint:
-    - sleep
-    - infinity
     image: docker/dev-environments-javascript:stable-1
+    entrypoint:
+      - sleep
+      - infinity
     init: true
     volumes:
-    - type: bind
-      source: /var/run/docker.sock
-      target: /var/run/docker.sock
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
 
+  backend:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.backend
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: "postgres://postgres:password@postgres:5432/mybloomminddb"
+    networks:
+      - dev-net
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - dev-net
+    depends_on:
+      - backend
+
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mybloomminddb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - dev-net
+
+networks:
+  dev-net:
+    driver: bridge
+
+volumes:
+  postgres-data:
