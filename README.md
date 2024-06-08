@@ -36,3 +36,5 @@ npm install
 
 - A la racine du projet :
 npm run start
+
+- Aller sur le port localhost:3000
