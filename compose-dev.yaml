@@ -11,37 +11,38 @@ services:
         source: /var/run/docker.sock
         target: /var/run/docker.sock
 
-    backend:
-      build:
-        context: ./backend
-        target: development
-      depends_on:
-        - db
-      environment:
-        - DATABASE_URL=postgresql://postgres:password@db:5432/mydatabase
-      ports:
-        - "3001:3001"
-    
-    frontend:
-      build:
-        context: ./frontend
-        target: development
-      environment:
-        - NEXT_PUBLIC_API_URL=http://localhost:3001
-      ports:
-        - "3000:3000"
-    
-    db:
-      image: postgres:13
-      restart: always
-      volumes:
-        - db-data:/var/lib/postgresql/data
-      environment:
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: password
-        POSTGRES_DB: mydatabase
-      ports:
-        - "5432:5432"
+    services:
+      backend:
+        build:
+          context: ./backend
+          target: development
+        depends_on:
+          - db
+        environment:
+          - DATABASE_URL=postgresql://postgres:password@db:5432/mydatabase
+        ports:
+          - "3001:3001"
+      
+      frontend:
+        build:
+          context: ./frontend
+          target: development
+        environment:
+          - NEXT_PUBLIC_API_URL=http://localhost:3001
+        ports:
+          - "3000:3000"
+      
+      db:
+        image: postgres:13
+        restart: always
+        volumes:
+          - db-data:/var/lib/postgresql/data
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: mydatabase
+        ports:
+          - "5432:5432"
 
 volumes:
   db-data:
